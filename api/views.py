@@ -9,7 +9,8 @@ import platform
 from django.conf import settings
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from serializers import YourSerializer
+from .serializers import YourSerializer
+from drf_yasg.utils import swagger_auto_schema
 # 아래 값은 필요시 수정
 from django.http import Http404, HttpResponse
 from django.views import View
@@ -20,20 +21,20 @@ prefix = ''
 
 
 class SmsSendApiHandler(APIView):
-    def get(request):
+    def get(self,request):
         return Response("GET 요청을 잘받았다")
-
-    def post(request):
+    @swagger_auto_schema(request_body=YourSerializer,query_serializer=YourSerializer)
+    def post(self,request):
 
         data = json.loads(request.body)
         if data is None:
             raise Http404
-        print('data')
+        print(data)
         receiver = data.get('receiver', None)
         _data = {
             'messages': [
                 {
-                    'to': receiver,
+                    'to': [receiver],
                     'from': settings.SMS_SENDER_PHONE_NUMBER,
                     'text': data.get('content', None),
                     'type': 'sms',
@@ -41,12 +42,14 @@ class SmsSendApiHandler(APIView):
             ]
         }
         response = send_sms_message(_data)
+        print(response.json())
+        response = json.dumps(response.json(),ensure_ascii=False)
         return Response(response)
 
-    def put(request):
+    def put(self,request):
         return Response("POST 요청을 잘받았다")
 
-    def delete(self):
+    def delete(self,request):
         return Response("POST 요청을 잘받았다")
 
 def unique_id():
