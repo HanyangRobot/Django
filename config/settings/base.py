@@ -11,7 +11,6 @@ https://docs.djangoproject.com/en/3.1/ref/settings/
 """
 
 from pathlib import Path
-from decouple import config
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
 
@@ -38,7 +37,8 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'drf_yasg',
-    'api'
+    'api',
+    'rest_framework',
 ]
 
 MIDDLEWARE = [
@@ -116,8 +116,8 @@ USE_L10N = True
 USE_TZ = True
 SMS_SENDER_PHONE_NUMBER = '01065464290'
 
-COOL_SMS_API_KEY = config('COOL_SMS_API_KEY', default='NCSBVVWR8Q64J7QX')
-COOL_SMS_API_SECRET = config('COOL_SMS_API_SECRET', default='EBASSQSG0TATP65GG4KIJ9CGRTH1HSYI')
+COOL_SMS_API_KEY = 'NCSBVVWR8Q64J7QX'
+COOL_SMS_API_SECRET = 'EBASSQSG0TATP65GG4KIJ9CGRTH1HSYI'
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/3.1/howto/static-files/

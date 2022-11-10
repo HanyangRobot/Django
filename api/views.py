@@ -7,7 +7,9 @@ import hashlib
 import requests
 import platform
 from django.conf import settings
-
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from serializers import YourSerializer
 # 아래 값은 필요시 수정
 from django.http import Http404, HttpResponse
 from django.views import View
@@ -17,15 +19,11 @@ domain = 'api.coolsms.co.kr'
 prefix = ''
 
 
-class SmsSendApiHandler(View):
+class SmsSendApiHandler(APIView):
+    def get(request):
+        return Response("GET 요청을 잘받았다")
 
-    def dispatch(self, request, *args, **kwargs):
-        return super(SmsSendApiHandler, self).dispatch(request, *args, **kwargs)
-
-    def get(self, request):
-        return HttpResponse("GET 요청을 잘받았다")
-
-    def post(self, request, *args, **kwargs):
+    def post(request):
 
         data = json.loads(request.body)
         if data is None:
@@ -42,14 +40,14 @@ class SmsSendApiHandler(View):
                 }
             ]
         }
-        send_sms_message(_data)
-        return HttpResponse("Sending SMS Job is enqueue")
+        response = send_sms_message(_data)
+        return Response(response)
 
-    def put(self, request, *args, **kwargs):
-        return HttpResponse("POST 요청을 잘받았다")
+    def put(request):
+        return Response("POST 요청을 잘받았다")
 
-    def delete(self, request, *args, **kwargs):
-        return HttpResponse("POST 요청을 잘받았다")
+    def delete(self):
+        return Response("POST 요청을 잘받았다")
 
 def unique_id():
     return str(uuid.uuid1().hex)
@@ -95,6 +93,6 @@ def send_sms_message(parameter):
         'sdkVersion': 'python/4.2.0',
         'osPlatform': platform.platform() + " | " + platform.python_version()
     }
-
-    return requests.post(get_url('/messages/v4/send-many'), headers=get_headers(api_key, api_secret), json=parameter)
+    res = requests.post(get_url('/messages/v4/send-many'), headers=get_headers(api_key, api_secret), json=parameter)
+    return res
 

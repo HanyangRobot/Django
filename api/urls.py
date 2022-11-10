@@ -1,5 +1,5 @@
 from django.urls import path
-from django_channels.api.views import SmsSendApiHandler
+from api.views import SmsSendApiHandler
 
 app_name = 'api'
 
