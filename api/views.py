@@ -1,4 +1,3 @@
-import json
 import time
 import datetime
 import uuid
@@ -12,35 +11,30 @@ from rest_framework import status
 from rest_framework.parsers import FormParser, MultiPartParser
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from .serializers import YourSerializer
 from drf_yasg.utils import swagger_auto_schema
-# 아래 값은 필요시 수정
-from django.http import Http404, HttpResponse
-from django.views import View
 
 protocol = 'https'
 domain = 'api.coolsms.co.kr'
 prefix = ''
-
-
+param1 = openapi.Parameter('receiver', openapi.IN_FORM, description="test manual param", type=openapi.TYPE_STRING)
+param2 = openapi.Parameter('content', openapi.IN_FORM, description="test manual param", type=openapi.TYPE_STRING)
 class SmsSendApiHandler(APIView):
-    @swagger_auto_schema(request_body= openapi.Schema(
-        type=openapi.TYPE_OBJECT,
-    properties={
-        'receiver': openapi.Schema(type=openapi.TYPE_STRING, description='string'),
-        'content': openapi.Schema(type=openapi.TYPE_STRING, description='string'),
-    }))
-    def post(self,request):
+    parser_classes = [FormParser,MultiPartParser]
+    @swagger_auto_schema(
+        manual_parameters=[param1,param2],
+        responses={
+            200:openapi.Schema(
+                type=openapi.TYPE_OBJECT,
+                properties={
+                    'status':openapi.Schema('status',type=openapi.TYPE_STRING)
+                }
+            )
 
-        # data = json.loads(request.body)
-        # if data is None:
-        #     raise Http404
-        # print(data)
+        }
+    )
+    def post(self,request):
         receiver = request.POST['receiver']
         content = request.POST['content']
-
-        # receiver = data.get('receiver', None)
-        # content = data.get('content', None)
         _data = {
             'messages': [
                 {
@@ -52,12 +46,9 @@ class SmsSendApiHandler(APIView):
             ]
         }
         response = send_sms_message(_data)
-        print(response.json())
         status_str=response.json()['status']
-        print(status)
-        # response = json.dumps(response.json(),ensure_ascii=False)
         custom_response = {'status':status_str}
-        return Response(custom_response,status=status.HTTP_201_CREATED,content_type="application/x-www-form-urlencoded")
+        return Response(custom_response,status=status.HTTP_200_OK,content_type="application/json")
 
 
 def unique_id():
@@ -105,6 +96,5 @@ def send_sms_message(parameter):
         'osPlatform': platform.platform() + " | " + platform.python_version()
     }
     res = requests.post(get_url('/messages/v4/send-many'), headers=get_headers(api_key, api_secret), json=parameter)
-    print(res)
     return res
 
