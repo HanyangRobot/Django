@@ -7,6 +7,9 @@ import hashlib
 import requests
 import platform
 from django.conf import settings
+from drf_yasg import openapi
+from rest_framework import status
+from rest_framework.parsers import FormParser, MultiPartParser
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from .serializers import YourSerializer
@@ -21,36 +24,41 @@ prefix = ''
 
 
 class SmsSendApiHandler(APIView):
-    def get(self,request):
-        return Response("GET 요청을 잘받았다")
-    @swagger_auto_schema(request_body=YourSerializer,query_serializer=YourSerializer)
+    @swagger_auto_schema(request_body= openapi.Schema(
+        type=openapi.TYPE_OBJECT,
+    properties={
+        'receiver': openapi.Schema(type=openapi.TYPE_STRING, description='string'),
+        'content': openapi.Schema(type=openapi.TYPE_STRING, description='string'),
+    }))
     def post(self,request):
 
-        data = json.loads(request.body)
-        if data is None:
-            raise Http404
-        print(data)
-        receiver = data.get('receiver', None)
+        # data = json.loads(request.body)
+        # if data is None:
+        #     raise Http404
+        # print(data)
+        receiver = request.POST['receiver']
+        content = request.POST['content']
+
+        # receiver = data.get('receiver', None)
+        # content = data.get('content', None)
         _data = {
             'messages': [
                 {
                     'to': [receiver],
                     'from': settings.SMS_SENDER_PHONE_NUMBER,
-                    'text': data.get('content', None),
+                    'text': content ,
                     'type': 'sms',
                 }
             ]
         }
         response = send_sms_message(_data)
         print(response.json())
-        response = json.dumps(response.json(),ensure_ascii=False)
-        return Response(response)
+        status_str=response.json()['status']
+        print(status)
+        # response = json.dumps(response.json(),ensure_ascii=False)
+        custom_response = {'status':status_str}
+        return Response(custom_response,status=status.HTTP_201_CREATED,content_type="application/x-www-form-urlencoded")
 
-    def put(self,request):
-        return Response("POST 요청을 잘받았다")
-
-    def delete(self,request):
-        return Response("POST 요청을 잘받았다")
 
 def unique_id():
     return str(uuid.uuid1().hex)
@@ -97,5 +105,6 @@ def send_sms_message(parameter):
         'osPlatform': platform.platform() + " | " + platform.python_version()
     }
     res = requests.post(get_url('/messages/v4/send-many'), headers=get_headers(api_key, api_secret), json=parameter)
+    print(res)
     return res
 
