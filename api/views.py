@@ -16,8 +16,8 @@ from drf_yasg.utils import swagger_auto_schema
 protocol = 'https'
 domain = 'api.coolsms.co.kr'
 prefix = ''
-param1 = openapi.Parameter('receiver', openapi.IN_FORM, description="test manual param", type=openapi.TYPE_STRING)
-param2 = openapi.Parameter('content', openapi.IN_FORM, description="test manual param", type=openapi.TYPE_STRING)
+param1 = openapi.Parameter('receiver', openapi.IN_FORM, description="수신자 전화 번호", type=openapi.TYPE_STRING)
+param2 = openapi.Parameter('content', openapi.IN_FORM, description="메세지 내용", type=openapi.TYPE_STRING)
 class SmsSendApiHandler(APIView):
     parser_classes = [FormParser,MultiPartParser]
     @swagger_auto_schema(
