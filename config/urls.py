@@ -21,11 +21,11 @@ from drf_yasg.views import get_schema_view
 from drf_yasg import openapi
 schema_view = get_schema_view(
    openapi.Info(
-      title="Snippets API",
+      title="Coolsms API",
       default_version='v1',
-      description="Test description",
+      description="Salesforce 연동을 위한 Django Rest Framework 기반 API",
       terms_of_service="https://www.google.com/policies/terms/",
-      contact=openapi.Contact(email="contact@snippets.local"),
+      contact=openapi.Contact(email="hojun0201@kusrc.co.kr"),
       license=openapi.License(name="BSD License"),
    ),
    public=True,
